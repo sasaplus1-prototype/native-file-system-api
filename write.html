@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>write - Native File System API</title>
+  </head>
+  <body>
+    <button type="button">write</button>
+    <br>
+    <textarea rows="20" cols="80"></textarea>
+    <br>
+    <span></span>
+    <script>
+      (function(){
+        'use strict';
+
+        const button = document.querySelector('button');
+
+        if (!('chooseFileSystemEntries' in window)) {
+          button.disabled = true;
+          return;
+        }
+
+        async function onClick() {
+          let handle;
+
+          try {
+            handle = await window.chooseFileSystemEntries({
+              type: 'saveFile',
+              accepts: [
+                {
+                  description: 'Text file',
+                  extensions: ['txt'],
+                  mimeTypes: ['text/plain'],
+                }
+              ],
+            });
+          } catch(e) {
+            document.querySelector('span').innerText = 'canceled.';
+            return;
+          }
+
+          const writer = await handle.createWriter();
+          const contents = document.querySelector('textarea').value;
+          await writer.write(0, contents);
+          await writer.close();
+          document.querySelector('span').innerText = 'saved!';
+        }
+
+        button.addEventListener('click', onClick);
+      }());
+    </script>
+  </body>
+</html>

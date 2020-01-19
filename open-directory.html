@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>open directory - Native File System API</title>
+  </head>
+  <body>
+    <button type="button">open directory</button>
+    <br>
+    <ul>
+    </ul>
+    <script>
+      (function(){
+        'use strict';
+
+        const button = document.querySelector('button');
+
+        if (!('chooseFileSystemEntries' in window)) {
+          button.disabled = true;
+          return;
+        }
+
+        async function onClick() {
+          const handle = await window.chooseFileSystemEntries({ type: 'openDirectory' });
+          const entries = await handle.getEntries();
+
+          let html = [];
+
+          for await (const entry of entries) {
+            const style = entry.isFile ? '' : 'color: blue; font-weight: bold;';
+
+            html.push(`<li style="${style}">${entry.name}</li>`);
+          }
+
+          document.querySelector('ul').innerHTML = html.join('');
+        }
+
+        button.addEventListener('click', onClick);
+      }());
+    </script>
+  </body>
+</html>
